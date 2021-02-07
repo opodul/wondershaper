@@ -20,10 +20,11 @@ I did not bother to make a configurable script. All is harcodded. So for informa
 - raspberrypi is connected to my internet routeur with eth0
 
 - raspberrypi access point is on wlan0 <br>192.167.10.1 is the ip of the pi, and dhcp distribute address from 192.167.10.10 to 192.167.10.19<br>
-192.167.10.10 = mine --> using class 1:10  <br>
-192.167.10.11 = wife_device1 --> using class 1:20 <br>
-192.167.10.12 = wife_device2 --> using class 1:20 <br>
-192.167.10.13+ considered for not priority users. --> using class 1:30
+192.167.10.10 = mine_device1 --> using class 1:10  <br>
+192.167.10.10 = mine_device2 --> using class 1:10  <br>
+192.167.10.12 = wife_device1 --> using class 1:20 <br>
+192.167.10.13 = wife_device2 --> using class 1:20 <br>
+192.167.10.14+ considered for not priority users. --> using class 1:30
 
 filter are based on ip addr, it could probably be done based on MAC but I did not investigated further.
 
