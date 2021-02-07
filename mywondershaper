@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+tc=tc
+IFACE=wlan0
+ipdstprio1A=192.168.10.10
+ipdstprio2A=192.168.10.11
+ipdstprio2B=192.168.10.12
+
+ROOTRATE=1200kbit
+CLASSRATE=500kbit
+CLASSCEIL=500kbit
+LOWCLASSCEIL=300kbit
+LOWCLASSRATE=300kbit
+
+$tc qdisc add dev "$IFACE" root handle 1: htb default 30
+
+$tc class add dev "$IFACE" parent 1: classid 1:1 htb rate ${ROOTRATE} prio 5
+
+$tc class add dev "$IFACE" parent 1:1 classid 1:10 htb rate ${CLASSRATE} ceil ${CLASSCEIL} prio 1
+$tc class add dev "$IFACE" parent 1:1 classid 1:20 htb rate ${CLASSRATE} ceil ${CLASSCEIL} prio 2
+$tc class add dev "$IFACE" parent 1:1 classid 1:30 htb rate ${LOWCLASSRATE} ceil ${LOWCLASSCEIL} prio 3
+
+$tc qdisc add dev "$IFACE" parent 1:10 handle 10: sfq perturb 10 quantum 6000
+$tc qdisc add dev "$IFACE" parent 1:20 handle 20: sfq perturb 10 quantum 6000
+$tc qdisc add dev "$IFACE" parent 1:30 handle 30: sfq perturb 10 quantum 6000
+
+$tc filter add dev "$IFACE" parent 1: protocol ip prio 15 u32 match ip dst "$ipdstprio1A" 0xffff flowid 1:10;
+$tc filter add dev "$IFACE" parent 1: protocol ip prio 16 u32 match ip dst "$ipdstprio2A" 0xffff flowid 1:20;
+$tc filter add dev "$IFACE" parent 1: protocol ip prio 17 u32 match ip dst "$ipdstprio2B" 0xffff flowid 1:20;
+ 
+#match anything else:   
+$tc filter add dev "$IFACE" parent 1: protocol ip prio 18 u32 match ip dst 0.0.0.0/0 flowid 1:30
